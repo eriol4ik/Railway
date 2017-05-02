@@ -1,20 +1,21 @@
 package domain.entities;
 
-import javax.persistence.Entity;
-import javax.persistence.Table;
-import java.math.BigDecimal;
+import domain.enums.CarriageType;
+
+import java.time.LocalTime;
+import java.time.Period;
 import java.util.Map;
 
-@Entity
-@Table(name = "TRAINS")
 public class Train {
-    private Long id;
+    // for example '097K'
+    private String trainId;
 
-    private Map<UnitRoute, Info> route;
+    private LocalTime departureTime;
+    private Period duration; // -> arrival time
 
-    private class Info {
-        Integer unitRouteTime;
-        Integer stopTime;
-        BigDecimal price;
-    }
+    private Map<Integer, CarriageType> carriageMap;
+
+    private Map<UnitRoute, TrainUnitRouteInfo> fullRoute;
+
+
 }
