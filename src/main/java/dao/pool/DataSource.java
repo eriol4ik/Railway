@@ -1,4 +1,4 @@
-package dao;
+package dao.pool;
 
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
