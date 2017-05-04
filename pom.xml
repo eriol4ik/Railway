@@ -46,11 +46,12 @@
             <version>5.1.42</version>
         </dependency>
 
-        <dependency>
+         <!--https://mvnrepository.com/artifact/org.apache.tomcat/tomcat-jdbc-->
+        <!--<dependency>
             <groupId>org.apache.tomcat</groupId>
             <artifactId>tomcat-jdbc</artifactId>
-            <version>7.0.35</version>
-        </dependency>
+            <version>8.5.14</version>
+        </dependency>-->
 
     </dependencies>
 </project>

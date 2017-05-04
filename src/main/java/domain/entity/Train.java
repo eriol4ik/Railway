@@ -1,6 +1,6 @@
-package domain.entities;
+package domain.entity;
 
-import domain.enums.CarriageType;
+import domain.enum_type.CarriageType;
 
 import java.time.LocalTime;
 import java.time.Period;

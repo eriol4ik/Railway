@@ -1,4 +1,4 @@
-package domain.enums;
+package domain.enum_type;
 
 public enum CarriageType {
     SEATING_FIRST_CLASS("Сидячий 1-го класса"),

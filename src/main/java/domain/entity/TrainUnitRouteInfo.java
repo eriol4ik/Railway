@@ -1,4 +1,4 @@
-package domain.entities;
+package domain.entity;
 
 import java.time.Period;
 

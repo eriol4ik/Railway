@@ -1,6 +1,6 @@
 package dao;
 
-import domain.entities.Station;
+import domain.entity.Station;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -13,6 +13,11 @@ public class StationDAOImplTest {
 
     @Before
     public void init() {
+            // Create initial context
+            System.clearProperty(Context.INITIAL_CONTEXT_FACTORY);
+            System.clearProperty(Context.URL_PKG_PREFIXES);
+
+        stationDAO = DAOFactory.getStationDAO();
         // TODO
     }
 
