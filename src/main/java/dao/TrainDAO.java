@@ -1,9 +1,9 @@
 package dao;
 
-import domain.entities.Station;
-import domain.entities.Train;
-import domain.enums.CarriageType;
-import domain.enums.PlaceStatus;
+import domain.entity.Station;
+import domain.entity.Train;
+import domain.enum_type.CarriageType;
+import domain.enum_type.PlaceStatus;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;

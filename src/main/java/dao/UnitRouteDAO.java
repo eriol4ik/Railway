@@ -1,7 +1,7 @@
 package dao;
 
-import domain.entities.Station;
-import domain.entities.UnitRoute;
+import domain.entity.Station;
+import domain.entity.UnitRoute;
 
 public interface UnitRouteDAO extends DAO<UnitRoute, Long> {
     UnitRoute find(Station startStation, Station endStation);

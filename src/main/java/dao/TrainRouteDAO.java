@@ -1,8 +1,8 @@
 package dao;
 
-import domain.entities.Train;
-import domain.entities.TrainUnitRouteInfo;
-import domain.entities.UnitRoute;
+import domain.entity.Train;
+import domain.entity.TrainUnitRouteInfo;
+import domain.entity.UnitRoute;
 
 import java.util.Map;
 

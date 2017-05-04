@@ -8,4 +8,8 @@ public class DAOFactory {
     public static TrainDAO getTrainDAO() {
         return new TrainDAOImpl();
     }
+
+    public static UnitRouteDAO getUnitRouteDAO() {
+        return new UnitRouteDAOImpl();
+    }
 }

@@ -1,16 +1,15 @@
 package dao;
 
 import dao.pool.ConnectionPool;
-import domain.entities.Station;
-import domain.entities.Train;
-import domain.enums.CarriageType;
-import domain.enums.PlaceStatus;
-import utils.EntityChecker;
+import domain.entity.Station;
+import domain.entity.Train;
+import domain.enum_type.CarriageType;
+import domain.enum_type.PlaceStatus;
+import util.EntityHelper;
 
 import java.math.BigDecimal;
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
@@ -19,19 +18,20 @@ public class TrainDAOImpl implements TrainDAO {
     private Connection connection;
 
     @Override
-    public void create(Train train) {
+    public String create(Train train) {
         try {
             connection = ConnectionPool.getConnection();
         } catch (SQLException e) {
             e.printStackTrace();
-            return;
+            return null;
         }
 
-        if (!EntityChecker.hasCompleteInformation(train)) return;
+        if (!EntityHelper.hasCompleteInfo(train)) return null;
 
 //        String query = "INSERT INTO trains (train_id, departure_time, duration) ";
 
 //        Statement statement = connection.prepareStatement();
+        return null;
     }
 
     @Override
