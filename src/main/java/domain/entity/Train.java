@@ -11,7 +11,7 @@ public class Train {
     private String trainId;
 
     private LocalTime departureTime;
-    private Period duration; // -> arrival time
+    private Integer duration; // -> arrival time
 
     private Map<Integer, CarriageType> carriageMap;
 
@@ -21,7 +21,7 @@ public class Train {
 
     public Train(String trainId,
                  LocalTime departureTime,
-                 Period duration,
+                 Integer duration,
                  Map<Integer, CarriageType> carriageMap,
                  Map<UnitRoute, TrainUnitRouteInfo> fullRoute) {
         this.trainId = trainId;
@@ -47,11 +47,11 @@ public class Train {
         this.departureTime = departureTime;
     }
 
-    public Period getDuration() {
+    public Integer getDuration() {
         return duration;
     }
 
-    public void setDuration(Period duration) {
+    public void setDuration(Integer duration) {
         this.duration = duration;
     }
 

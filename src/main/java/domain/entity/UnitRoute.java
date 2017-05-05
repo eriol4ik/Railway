@@ -73,11 +73,12 @@ public class UnitRoute {
 
     @Override
     public String toString() {
-        String temp = "UnitRoute{@" + super.toString();
-        temp += ", id=" + routeId;
-        temp += ", start='" + start;
-        temp += "', end='" + end;
-        temp += "', distance" + distance;
+        String temp = super.toString();
+        temp += "{id=" + routeId;
+        temp += ", start=" + start;
+        temp += ", end=" + end;
+        temp += ", distance='" + distance;
+        temp += "'}";
 
         return temp;
     }

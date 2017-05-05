@@ -49,9 +49,11 @@ public class Station {
 
     @Override
     public String toString() {
-        return "Station{@" + super.toString() +
-                ", id=" + stationId +
-                ", name=" + name +
-                "}";
+        String temp = super.toString();
+        temp += "{id='" + stationId;
+        temp += "', name='" + name;
+        temp += "'}";
+
+        return temp;
     }
 }
