@@ -2,9 +2,12 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <html>
 <head>
-    <title>Temp</title>
+    <title>Test</title>
 </head>
 <body>
-${station.name}
+${route.routeId},
+${route.start.name},
+${route.end.name},
+${route.distance}
 </body>
 </html>

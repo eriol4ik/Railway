@@ -1,12 +1,12 @@
 package domain.enum_type;
 
 public enum CarriageType {
-    SEATING_FIRST_CLASS("Сидячий 1-го класса"),
-    SEATING_SECOND_CLASS("Сидячий 2-го класса"),
-    SEATING_THIRD_CLASS("Сидячий 3-го класса"),
-    SLEEPER_FIRST_CLASS("Люкс"),
-    SLEEPER_SECOND_CLASS("Купе"),
-    SLEEPER_THIRD_CLASS("Плацкарт");
+    SEATING_1CL("Сидячий 1-го класса"),
+    SEATING_2CL("Сидячий 2-го класса"),
+    SEATING_3CL("Сидячий 3-го класса"),
+    SLEEPER_1CL("Люкс"),
+    SLEEPER_2CL("Купе"),
+    SLEEPER_3CL("Плацкарт");
 
     private String label;
 

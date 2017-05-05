@@ -20,26 +20,11 @@ import java.io.PrintWriter;
 public class TestServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        test2();
-    }
-
-    private void test2() {
-        UnitRouteDAO unitRouteDAO = DAOFactory.getUnitRouteDAO();
-
-        Station start = new Station("Киев");
-        Station end = new Station("Ровно");
-        Integer distance = 38378;
-
-        UnitRoute route = new UnitRoute(start, end, distance);
-
-        unitRouteDAO.create(route);
-        UnitRoute route2 = unitRouteDAO.read(route.getRouteId());
-
-        System.out.println(route);
-        System.out.println(route.hashCode());
-        System.out.println(route2);
-        System.out.println(route2.hashCode());
-        System.out.println(route.equals(route2));
+        StationDAO stationDAO = DAOFactory.getStationDAO();
+        System.out.println(stationDAO.read(43L));
+        System.out.println(stationDAO.read(43L));
+        System.out.println(stationDAO.read(43L));
+        System.out.println(stationDAO.read(43L));
     }
 
     private void test1(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
@@ -62,4 +47,36 @@ public class TestServlet extends HttpServlet {
             out.println("HELLOOO");
         }
     }
+
+    private void test2() {
+        UnitRouteDAO unitRouteDAO = DAOFactory.getUnitRouteDAO();
+
+        Station start = new Station("Киев");
+        Station end = new Station("Ровно");
+        Integer distance = 38378;
+
+        UnitRoute route = new UnitRoute(start, end, distance);
+
+        unitRouteDAO.create(route);
+        UnitRoute route2 = unitRouteDAO.read(route.getRouteId());
+
+        System.out.println(route);
+        System.out.println(route.hashCode());
+        System.out.println(route2);
+        System.out.println(route2.hashCode());
+        System.out.println(route.equals(route2));
+    }
+
+    private void test3(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        StationDAO stationDAO = DAOFactory.getStationDAO();
+        UnitRouteDAO routeDAO = DAOFactory.getUnitRouteDAO();
+
+
+        UnitRoute route = routeDAO.find("киев", "ровно");
+        System.out.println(route);
+
+        req.setAttribute("route", route);
+        req.getRequestDispatcher(JSPPaths.TEST_PAGE).forward(req, resp);
+    }
+
 }

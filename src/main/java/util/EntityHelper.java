@@ -10,7 +10,6 @@ import domain.enum_type.CarriageType;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.time.Duration;
 import java.util.Map;
 
 public class EntityHelper {
@@ -33,6 +32,13 @@ public class EntityHelper {
         return station.getStationId() != null &&
                station.getName() != null &&
                !station.getName().isEmpty();
+    }
+
+    public static Boolean hasCompleteInfo(UnitRoute route) {
+        return route.getRouteId() != null &&
+               route.getStart() != null &&
+               route.getEnd() != null &&
+               route.getDistance() != null;
     }
 
     public static Station generateStationFromResultSet(ResultSet resultSet) throws SQLException {
