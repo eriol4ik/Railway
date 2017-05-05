@@ -25,18 +25,20 @@ CREATE TABLE railway.train_routes
 (
     train_route_id BIGINT(20) PRIMARY KEY AUTO_INCREMENT,
     unit_route_id BIGINT(20) NOT NULL,
+    next_unit_route_id BIGINT(20) NOT NULL,
     train_id VARCHAR(4) NOT NULL,
     duration INT NOT NULL,
     stop_time INT NOT NULL,
     CONSTRAINT train_id_fk FOREIGN KEY (train_id) REFERENCES trains (train_id),
-    CONSTRAINT unit_route_id_fk FOREIGN KEY (unit_route_id) REFERENCES routes (route_id)
+    CONSTRAINT unit_route_id_fk FOREIGN KEY (unit_route_id) REFERENCES routes (route_id),
+    CONSTRAINT next_unit_route_id_fk FOREIGN KEY (next_unit_route_id) REFERENCES routes (route_id)
 );
 
 CREATE TABLE railway.train_routes_prices
 (
     train_route_price_id BIGINT(20) PRIMARY KEY AUTO_INCREMENT,
     train_route_id BIGINT(20) NOT NULL,
-    carriage_type INT NOT NULL,
+    carriage_type VARCHAR(15) NOT NULL,
     price DECIMAL(10,2) NOT NULL,
     CONSTRAINT train_route_id_fk FOREIGN KEY (train_route_id) REFERENCES train_routes (train_route_id)
 );
@@ -46,7 +48,7 @@ CREATE TABLE railway.carriages
     carriage_id BIGINT(20) PRIMARY KEY AUTO_INCREMENT,
     train_id VARCHAR(4) NOT NULL,
     carriage_number INT NOT NULL,
-    carriage_type INT NOT NULL,
+    carriage_type VARCHAR(15) NOT NULL,
     CONSTRAINT train_id_fk2 FOREIGN KEY (train_id) REFERENCES trains (train_id)
 );
 
