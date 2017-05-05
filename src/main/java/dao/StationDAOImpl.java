@@ -26,14 +26,14 @@ public class StationDAOImpl implements StationDAO {
             return null;
         }
 
-        String query = "INSERT INTO stations (name) VALUES (?)";
-        String query2 = "SELECT LAST_INSERT_ID()";
+        String insertQuery = "INSERT INTO stations (name) VALUES (?)";
+        String selectIdQuery = "SELECT LAST_INSERT_ID()";
 
         try {
-            PreparedStatement statement = connection.prepareStatement(query);
+            PreparedStatement statement = connection.prepareStatement(insertQuery);
             statement.setString(1, station.getName());
             statement.execute();
-            ResultSet resultSet = statement.executeQuery(query2);
+            ResultSet resultSet = statement.executeQuery(selectIdQuery);
             Long stationId = null;
             if (resultSet.next()) {
                 stationId = resultSet.getLong(1);
@@ -89,7 +89,6 @@ public class StationDAOImpl implements StationDAO {
 
         try {
             connection = ConnectionPool.getConnection();
-            connection.setAutoCommit(false);
         } catch (SQLException e) {
             e.printStackTrace();
             return;
@@ -119,7 +118,6 @@ public class StationDAOImpl implements StationDAO {
 
         try {
             connection = ConnectionPool.getConnection();
-            connection.setAutoCommit(false);
         } catch (SQLException e) {
             e.printStackTrace();
             return;
@@ -136,11 +134,9 @@ public class StationDAOImpl implements StationDAO {
         } catch (SQLException e) {
             e.printStackTrace();
             rollback(connection);
-            return;
         } finally {
             close(connection);
         }
-
     }
 
     @Override
@@ -164,12 +160,18 @@ public class StationDAOImpl implements StationDAO {
             statement.setString(1, name.toLowerCase());
             resultSet = statement.executeQuery();
 
-            return EntityHelper.generateStationFromResultSet(resultSet);
+            Station station;
+            if (resultSet.next()) {
+                station = new Station();
+                station.setStationId(resultSet.getLong(1));
+                station.setName(resultSet.getString(2));
+                return station;
+            }
         } catch (SQLException e) {
             e.printStackTrace();
-            return null;
         } finally {
             close(connection);
         }
+        return null;
     }
 }

@@ -5,4 +5,5 @@ import domain.entity.UnitRoute;
 
 public interface UnitRouteDAO extends DAO<UnitRoute, Long> {
     UnitRoute find(Station startStation, Station endStation);
+    UnitRoute find(String startStationName, String endStationName);
 }

@@ -10,8 +10,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-import static util.ConnectionManager.close;
-import static util.ConnectionManager.rollback;
+import static util.ConnectionManager.*;
 
 public class UnitRouteDAOImpl implements UnitRouteDAO {
     private Connection connection;
@@ -102,17 +101,107 @@ public class UnitRouteDAOImpl implements UnitRouteDAO {
     }
 
     @Override
-    public void update(UnitRoute entity) {
+    public void update(UnitRoute route) {
+        if (EntityHelper.hasCompleteInfo(route)) {
+            return;
+        }
 
+        try {
+            connection = ConnectionPool.getConnection();
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return;
+        }
+
+        String query = "UPDATE routes SET start_station_id = ?, end_station_id = ?, distance = ? WHERE route_id = ?";
+
+        try {
+            PreparedStatement preparedStatement = connection.prepareStatement(query);
+            preparedStatement.setLong(1, route.getStart().getStationId());
+            preparedStatement.setLong(2, route.getEnd().getStationId());
+            preparedStatement.setInt(3, route.getDistance());
+            preparedStatement.setLong(4, route.getRouteId());
+            preparedStatement.execute();
+        } catch (SQLException e) {
+            e.printStackTrace();
+            rollback(connection);
+        } finally {
+            close(connection);
+        }
     }
 
     @Override
-    public void delete(UnitRoute entity) {
+    public void delete(UnitRoute route) {
+        if (EntityHelper.hasCompleteInfo(route)) {
+            return;
+        }
+
+        try {
+            connection = ConnectionPool.getConnection();
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return;
+        }
+
+        String query = "DELETE FROM routes WHERE route_id = ?";
+
+        try {
+            PreparedStatement preparedStatement = connection.prepareStatement(query);
+            preparedStatement.setLong(1, route.getRouteId());
+            preparedStatement.execute();
+            route.setRouteId(null);
+        } catch (SQLException e) {
+            e.printStackTrace();
+            rollback(connection);
+        } finally {
+            close(connection);
+        }
 
     }
 
     @Override
     public UnitRoute find(Station startStation, Station endStation) {
+        if (startStation == null || endStation == null) {
+            return null;
+        }
+
+        try {
+            connection = ConnectionPool.getConnection();
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return null;
+        }
+
+        String query = "SELECT route_id, distance FROM routes WHERE start_station_id = ? AND end_station_id = ?";
+
+        try {
+            PreparedStatement preparedStatement = connection.prepareStatement(query);
+            preparedStatement.setLong(1, startStation.getStationId());
+            preparedStatement.setLong(2, endStation.getStationId());
+            ResultSet resultSet = preparedStatement.executeQuery();
+            UnitRoute route;
+            if (resultSet.next()) {
+                route = new UnitRoute();
+                route.setRouteId(resultSet.getLong(1));
+                route.setStart(startStation);
+                route.setEnd(endStation);
+                route.setDistance(resultSet.getInt(2));
+                return route;
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            close(connection);
+        }
+
         return null;
+    }
+
+    @Override
+    public UnitRoute find(String startStationName, String endStationName) {
+        StationDAO stationDAO = DAOFactory.getStationDAO();
+        Station start = stationDAO.find(startStationName);
+        Station end = stationDAO.find(endStationName);
+        return find(start, end);
     }
 }
