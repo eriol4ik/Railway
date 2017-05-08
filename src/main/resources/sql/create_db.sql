@@ -1,12 +1,12 @@
-CREATE SCHEMA `railway`;
+# CREATE SCHEMA `railway`;
 
 CREATE TABLE railway.stations (
   station_id BIGINT(20) PRIMARY KEY AUTO_INCREMENT,
   name VARCHAR(45) NOT NULL);
 
-CREATE TABLE railway.routes
+CREATE TABLE railway.unit_routes
 (
-    route_id BIGINT(20) PRIMARY KEY AUTO_INCREMENT,
+    unit_route_id BIGINT(20) PRIMARY KEY AUTO_INCREMENT,
     start_station_id BIGINT(20) NOT NULL,
     end_station_id BIGINT(20) NOT NULL,
     distance INT NOT NULL,
@@ -21,26 +21,26 @@ CREATE TABLE railway.trains
     duration INT NOT NULL
 );
 
-CREATE TABLE railway.train_routes
+CREATE TABLE railway.train_unit_routes
 (
-    train_route_id BIGINT(20) PRIMARY KEY AUTO_INCREMENT,
+    train_unit_route_id BIGINT(20) PRIMARY KEY AUTO_INCREMENT,
     unit_route_id BIGINT(20) NOT NULL,
-    next_unit_route_id BIGINT(20) NOT NULL,
+    previous_unit_route_id BIGINT(20),
     train_id VARCHAR(4) NOT NULL,
     duration INT NOT NULL,
     stop_time INT NOT NULL,
     CONSTRAINT train_id_fk FOREIGN KEY (train_id) REFERENCES trains (train_id),
-    CONSTRAINT unit_route_id_fk FOREIGN KEY (unit_route_id) REFERENCES routes (route_id),
-    CONSTRAINT next_unit_route_id_fk FOREIGN KEY (next_unit_route_id) REFERENCES routes (route_id)
+    CONSTRAINT unit_route_id_fk FOREIGN KEY (unit_route_id) REFERENCES unit_routes (unit_route_id),
+    CONSTRAINT previous_unit_route_id_fk FOREIGN KEY (previous_unit_route_id) REFERENCES unit_routes (unit_route_id)
 );
 
-CREATE TABLE railway.train_routes_prices
+CREATE TABLE railway.train_unit_routes_prices
 (
-    train_route_price_id BIGINT(20) PRIMARY KEY AUTO_INCREMENT,
-    train_route_id BIGINT(20) NOT NULL,
+    train_unit_route_price_id BIGINT(20) PRIMARY KEY AUTO_INCREMENT,
+    train_unit_route_id BIGINT(20) NOT NULL,
     carriage_type VARCHAR(15) NOT NULL,
     price DECIMAL(10,2) NOT NULL,
-    CONSTRAINT train_route_id_fk FOREIGN KEY (train_route_id) REFERENCES train_routes (train_route_id)
+    CONSTRAINT train_unit_route_id_fk FOREIGN KEY (train_unit_route_id) REFERENCES train_unit_routes (train_unit_route_id)
 );
 
 CREATE TABLE railway.carriages
@@ -63,10 +63,10 @@ CREATE TABLE railway.carriage_places
 CREATE TABLE railway.places_availability
 (
     place_availability_id BIGINT(20) PRIMARY KEY AUTO_INCREMENT,
-    train_route_id BIGINT(20) NOT NULL,
+    train_unit_route_id BIGINT(20) NOT NULL,
     place_id BIGINT(20) NOT NULL,
     departure_date DATE NOT NULL,
     place_status INT NOT NULL,
-    CONSTRAINT train_route_id_fk2 FOREIGN KEY (train_route_id) REFERENCES train_routes (train_route_id),
+    CONSTRAINT train_route_id_fk2 FOREIGN KEY (train_unit_route_id) REFERENCES train_unit_routes (train_unit_route_id),
     CONSTRAINT place_id_fk FOREIGN KEY (place_id) REFERENCES carriage_places (place_id)
 );

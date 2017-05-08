@@ -20,4 +20,6 @@ public interface TrainDAO extends DAO<Train, String> {
 
     Map<Integer, Map<Integer, PlaceStatus>> readAvailabilityMap(Train train);
     Map<CarriageType, BigDecimal> readTicketPrices(Train train);
+
+
 }

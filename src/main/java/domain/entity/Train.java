@@ -70,4 +70,37 @@ public class Train {
     public void setFullRoute(Map<UnitRoute, TrainUnitRouteInfo> fullRoute) {
         this.fullRoute = fullRoute;
     }
+
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append(super.toString())
+                .append("{")
+                .append("id=")
+                .append(trainId)
+                .append(", departureTime=")
+                .append(departureTime)
+                .append(", duration=")
+                .append(duration)
+                .append(", carriageMap{");
+        for (Map.Entry<Integer, CarriageType> entry : carriageMap.entrySet()) {
+            sb.append(entry.getKey())
+                    .append(":")
+                    .append(entry.getValue())
+                    .append(",");
+        }
+        sb.deleteCharAt(sb.length() - 1);
+        sb.append("}");
+        sb.append(", fullRoute{");
+        for (Map.Entry<UnitRoute, TrainUnitRouteInfo> entry : fullRoute.entrySet()) {
+            sb.append(entry.getKey())
+                    .append(":")
+                    .append(entry.getValue())
+                    .append(",");
+        }
+        sb.deleteCharAt(sb.length() - 1);
+        sb.append("}");
+
+        return sb.toString();
+    }
 }
