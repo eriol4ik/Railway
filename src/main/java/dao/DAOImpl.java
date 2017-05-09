@@ -1,6 +1,6 @@
 package dao;
 
-import dao.pool.ConnectionPool;
+import exception.PersistentException;
 
 import java.io.Serializable;
 import java.sql.Connection;
@@ -11,16 +11,12 @@ import java.sql.SQLException;
 public abstract class DAOImpl<T, PK extends Serializable> implements DAO<T, PK> {
     protected Connection connection;
 
-    public PK create(T entity) throws SQLException {
+    public PK create(T entity) throws PersistentException {
         if (!checkForCreate(entity)) return null;
-
-        initConnection();
 
         execute(getCreateQuery(), getCreateParameters(entity));
 
         ResultSet resultSet = executeQuery(getSelectIdQuery());
-
-        commitAndClose();
 
         PK id = parseForCreate(resultSet);
 
@@ -29,14 +25,11 @@ public abstract class DAOImpl<T, PK extends Serializable> implements DAO<T, PK> 
         return id;
     }
 
-    public T read(PK id) throws SQLException {
+    public T read(PK id) throws PersistentException {
         if (!checkForRead(id)) return null;
-
-        initConnection();
 
         ResultSet resultSet = executeQuery(getReadQuery(),
                                            id);
-        commitAndClose();
 
         T entity = parseForRead(resultSet);
 
@@ -45,26 +38,18 @@ public abstract class DAOImpl<T, PK extends Serializable> implements DAO<T, PK> 
         return entity;
     }
 
-    public void update(T entity) throws SQLException {
+    public void update(T entity) throws PersistentException {
         if (!checkForUpdate(entity)) return;
 
-        initConnection();
-
         execute(getUpdateQuery(), getUpdateParameters(entity));
-
-        commitAndClose();
     }
 
-    public void delete(T entity) throws SQLException {
+    public void delete(T entity) throws PersistentException {
         if (!checkForDelete(entity)) return;
-
-        initConnection();
 
         execute(getDeleteQuery(), getDeleteParameters(entity));
 
         setPK(entity, null);
-
-        commitAndClose();
     }
 
     protected abstract Boolean checkForCreate(T entity);
@@ -78,56 +63,49 @@ public abstract class DAOImpl<T, PK extends Serializable> implements DAO<T, PK> 
     protected abstract String getUpdateQuery();
     protected abstract String getDeleteQuery();
 
-    protected abstract Object[] getCreateParameters(T entity) throws SQLException;
+    protected abstract Object[] getCreateParameters(T entity) throws PersistentException;
     protected abstract Object[] getUpdateParameters(T entity);
     protected abstract Object[] getDeleteParameters(T entity);
 
-    protected abstract PK parseForCreate(ResultSet resultSet) throws SQLException;
+    protected abstract PK parseForCreate(ResultSet resultSet) throws PersistentException;
     protected abstract void setPK(T entity, PK id);
-    protected abstract T parseForRead(ResultSet resultSet) throws SQLException;
+    protected abstract T parseForRead(ResultSet resultSet) throws PersistentException;
 
-    protected ResultSet executeQuery(String query, Object... parameters) throws SQLException {
-        PreparedStatement statement = connection.prepareStatement(query);
-
-        for (int i = 0; i < parameters.length; i++) {
-            statement.setObject(i + 1, parameters[i]);
-        }
-
-        return statement.executeQuery();
-    }
-
-    protected Boolean execute(String query, Object... parameters) throws SQLException {
-        PreparedStatement statement = connection.prepareStatement(query);
-
-        for (int i = 0; i < parameters.length; i++) {
-            statement.setObject(i + 1, parameters[i]);
-        }
-
-        return statement.execute();
-    }
-
-    protected void initConnection() throws SQLException {
-        connection = ConnectionPool.getConnection();
-        connection.setAutoCommit(false);
-    }
-
-    protected void commitAndClose() throws SQLException {
+    protected ResultSet executeQuery(String query, Object... parameters) throws PersistentException {
         try {
-            connection.commit();
+            PreparedStatement statement = connection.prepareStatement(query);
+
+            for (int i = 0; i < parameters.length; i++) {
+                statement.setObject(i + 1, parameters[i]);
+            }
+
+            return statement.executeQuery();
         } catch (SQLException e) {
-            e.printStackTrace();
-            connection.rollback();
-        } finally {
-            connection.close();
+            throw new PersistentException(PersistentException.QUERY_ERROR, e);
         }
     }
 
-    protected void commit() throws SQLException {
+    protected Boolean execute(String query, Object... parameters) throws PersistentException {
         try {
-            connection.commit();
+            PreparedStatement statement = connection.prepareStatement(query);
+
+            for (int i = 0; i < parameters.length; i++) {
+                statement.setObject(i + 1, parameters[i]);
+            }
+
+            return statement.execute();
         } catch (SQLException e) {
-            e.printStackTrace();
-            connection.rollback();
+            throw new PersistentException(PersistentException.QUERY_ERROR, e);
         }
+    }
+
+    @Override
+    public Connection getConnection() {
+        return connection;
+    }
+
+    @Override
+    public void setConnection(Connection connection) {
+        this.connection = connection;
     }
 }

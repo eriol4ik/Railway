@@ -1,6 +1,7 @@
 package dao;
 
 import domain.entity.Station;
+import exception.PersistentException;
 import util.EntityHelper;
 
 import java.sql.*;
@@ -11,30 +12,51 @@ public class StationDAOImpl extends DAOImpl<Station, Long> implements StationDAO
     private final String READ_QUERY = "SELECT name FROM stations WHERE station_id = ?";
     private final String UPDATE_QUERY = "UPDATE stations SET name = ? WHERE station_id = ?";
     private final String DELETE_QUERY = "DELETE FROM stations WHERE station_id = ? AND name = ?";
+    private final String FIND_QUERY = "SELECT station_id, name FROM stations WHERE LOWER(name) = ?";
 
+    private static StationDAO instance;
+
+    private StationDAOImpl() {}
+
+    public static StationDAO getInstance() {
+        if (instance == null) {
+            synchronized (StationDAOImpl.class) {
+                if (instance == null) {
+                    instance = new StationDAOImpl();
+                }
+            }
+        }
+        return instance;
+    }
 
     @Override
-    public Station find(String name) throws SQLException {
+    public Station find(String name) throws PersistentException {
         if (name == null || name.isEmpty()) {
             return null;
         }
 
-        initConnection();
-
-        String query = "SELECT station_id, name FROM stations WHERE LOWER(name) = ?";
+        String query = getFindQuery();
         ResultSet resultSet = executeQuery(query, name.toLowerCase());
 
-        Station station;
-        if (resultSet.next()) {
-            station = new Station();
-            station.setStationId(resultSet.getLong(1));
-            station.setName(resultSet.getString(2));
+        return parseForFind(resultSet);
+    }
+
+    private Station parseForFind(ResultSet resultSet) throws PersistentException {
+        try {
+            Station station = null;
+            if (resultSet.next()) {
+                station = new Station();
+                station.setStationId(resultSet.getLong(1));
+                station.setName(resultSet.getString(2));
+            }
             return station;
+        } catch (SQLException e) {
+            throw new PersistentException(PersistentException.PARSING_ERROR, e);
         }
+    }
 
-        commitAndClose();
-
-        return null;
+    private String getFindQuery() {
+        return FIND_QUERY;
     }
 
     @Override
@@ -99,12 +121,16 @@ public class StationDAOImpl extends DAOImpl<Station, Long> implements StationDAO
     }
 
     @Override
-    protected Long parseForCreate(ResultSet resultSet) throws SQLException {
-        Long stationId = null;
-        if (resultSet.next()) {
-            stationId = resultSet.getLong(1);
+    protected Long parseForCreate(ResultSet resultSet) throws PersistentException {
+        try {
+            Long stationId = null;
+            if (resultSet.next()) {
+                stationId = resultSet.getLong(1);
+            }
+            return stationId;
+        } catch (SQLException e) {
+            throw new PersistentException(PersistentException.PARSING_ERROR, e);
         }
-        return stationId;
     }
 
     @Override
@@ -113,12 +139,16 @@ public class StationDAOImpl extends DAOImpl<Station, Long> implements StationDAO
     }
 
     @Override
-    protected Station parseForRead(ResultSet resultSet) throws SQLException {
-        Station station = null;
-        if (resultSet.next()) {
-            station = new Station();
-            station.setName(resultSet.getString(1));
+    protected Station parseForRead(ResultSet resultSet) throws PersistentException {
+        try {
+            Station station = null;
+            if (resultSet.next()) {
+                station = new Station();
+                station.setName(resultSet.getString(1));
+            }
+            return station;
+        } catch (SQLException e) {
+            throw new PersistentException(PersistentException.PARSING_ERROR, e);
         }
-        return station;
     }
 }

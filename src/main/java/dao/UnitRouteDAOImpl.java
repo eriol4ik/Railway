@@ -2,6 +2,7 @@ package dao;
 
 import domain.entity.Station;
 import domain.entity.UnitRoute;
+import exception.PersistentException;
 import util.EntityHelper;
 
 import java.sql.ResultSet;
@@ -15,6 +16,20 @@ public class UnitRouteDAOImpl extends DAOImpl<UnitRoute, Long> implements UnitRo
     private final String DELETE_QUERY = "DELETE FROM unit_routes WHERE unit_route_id = ?";
     private final String FIND_QUERY = "SELECT unit_route_id, distance FROM unit_routes WHERE start_station_id = ? AND end_station_id = ?";
 
+    private static UnitRouteDAO instance;
+
+    private UnitRouteDAOImpl() {}
+
+    public static UnitRouteDAO getInstance() {
+        if (instance == null) {
+            synchronized (UnitRouteDAOImpl.class) {
+                if (instance == null) {
+                    instance = new UnitRouteDAOImpl();
+                }
+            }
+        }
+        return instance;
+    }
 
     @Override
     protected Boolean checkForCreate(UnitRoute route) {
@@ -64,7 +79,7 @@ public class UnitRouteDAOImpl extends DAOImpl<UnitRoute, Long> implements UnitRo
     }
 
     @Override
-    protected Object[] getCreateParameters(UnitRoute route) throws SQLException {
+    protected Object[] getCreateParameters(UnitRoute route) throws PersistentException {
         Long startStationId = route.getStart().getStationId();
         if (route.getStart().getStationId() == null) {
             startStationId = DAOFactory.getStationDAO().create(route.getStart());
@@ -91,13 +106,17 @@ public class UnitRouteDAOImpl extends DAOImpl<UnitRoute, Long> implements UnitRo
     }
 
     @Override
-    protected Long parseForCreate(ResultSet resultSet) throws SQLException {
-        Long routeId = null;
-        if (resultSet.next()) {
-            routeId = resultSet.getLong(1);
-        }
+    protected Long parseForCreate(ResultSet resultSet) throws PersistentException {
+        try {
+            Long routeId = null;
+            if (resultSet.next()) {
+                routeId = resultSet.getLong(1);
+            }
 
-        return routeId;
+            return routeId;
+        } catch (SQLException e) {
+            throw new PersistentException(PersistentException.PARSING_ERROR);
+        }
     }
 
     @Override
@@ -106,50 +125,61 @@ public class UnitRouteDAOImpl extends DAOImpl<UnitRoute, Long> implements UnitRo
     }
 
     @Override
-    protected UnitRoute parseForRead(ResultSet resultSet) throws SQLException {
-        UnitRoute route = null;
-        if (resultSet.next()) {
-            StationDAO stationDAO = DAOFactory.getStationDAO();
+    protected UnitRoute parseForRead(ResultSet resultSet) throws PersistentException {
+        try {
+            UnitRoute route = null;
+            if (resultSet.next()) {
+                StationDAO stationDAO = DAOFactory.getStationDAO();
+                stationDAO.setConnection(connection);
 
-            Station start = stationDAO.read(resultSet.getLong(1));
-            Station end = stationDAO.read(resultSet.getLong(2));
-            Integer distance = resultSet.getInt(3);
+                Station start = stationDAO.read(resultSet.getLong(1));
+                Station end = stationDAO.read(resultSet.getLong(2));
+                Integer distance = resultSet.getInt(3);
 
-            if (start == null || end == null) {
-                return null;
+                if (start == null || end == null) {
+                    return null;
+                }
+
+                route = new UnitRoute(start, end, distance);
             }
-
-            route = new UnitRoute(start, end, distance);
+            return route;
+        } catch (SQLException e) {
+            throw new PersistentException(PersistentException.PARSING_ERROR);
         }
-        return route;
     }
 
     @Override
-    public UnitRoute find(Station startStation, Station endStation) throws SQLException {
+    public UnitRoute find(Station startStation, Station endStation) throws PersistentException {
         if (startStation == null || endStation == null) {
             return null;
         }
 
-        initConnection();
-
         ResultSet resultSet = executeQuery(FIND_QUERY, startStation.getStationId(), endStation.getStationId());
 
-        UnitRoute route = null;
-        if (resultSet.next()) {
-            route = new UnitRoute();
-            route.setRouteId(resultSet.getLong(1));
-            route.setStart(startStation);
-            route.setEnd(endStation);
-            route.setDistance(resultSet.getInt(2));
-        }
-
-        commitAndClose();
+        UnitRoute route = parseForRead(startStation, endStation, resultSet);
+        route.setStart(startStation);
+        route.setEnd(endStation);
 
         return route;
     }
 
+    private UnitRoute parseForRead(Station startStation, Station endStation, ResultSet resultSet) throws PersistentException {
+        try {
+            UnitRoute route = null;
+            if (resultSet.next()) {
+                route = new UnitRoute();
+                route.setRouteId(resultSet.getLong(1));
+                route.setDistance(resultSet.getInt(2));
+            }
+
+            return route;
+        } catch (SQLException e) {
+            throw new PersistentException(PersistentException.PARSING_ERROR);
+        }
+    }
+
     @Override
-    public UnitRoute find(String startStationName, String endStationName) throws SQLException {
+    public UnitRoute find(String startStationName, String endStationName) throws PersistentException {
         StationDAO stationDAO = DAOFactory.getStationDAO();
         Station start = stationDAO.find(startStationName);
         Station end = stationDAO.find(endStationName);
